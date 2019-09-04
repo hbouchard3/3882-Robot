@@ -18,6 +18,11 @@
 #define IN3 9  // right motor control
 #define IN4 11 // right motor control
 
+// state machine states
+#define MOVE 12
+#define OBJECT_IN_PATH 13
+#define AT_STATION 14
+
 // Ultrasonic rangefinder pin connections
 #define Echo A4
 #define Trig A5
@@ -32,6 +37,7 @@
 #define LT_M !digitalRead(4)
 #define LT_L !digitalRead(2)
 
+
 // global variables
 Servo head;  // create servo object to control the looking direction
 long prevMillis; // used to time loop()
@@ -45,6 +51,30 @@ long prevMillis; // used to time loop()
  *  create the latter), and functions could interpret sensor
  *  data, change states, enact behaviors, etc.
  */
+
+
+/*
+ * Function for state "AT_STATION"
+ * 
+ * Waits for one second, then checks whether there is an object to the right of the robot within 12 inches.
+ */
+void atStation(){
+  
+}
+
+/*
+ * Function for state "MOVE"
+ */
+void move(){
+  // 
+}
+
+/*
+ * Function for state "OBJECT_IN_PATH"
+ */
+void objectInPath(){
+  
+}
 
 /**
  * You may or may not want functions like stopRobot().  With your chosen
@@ -125,6 +155,29 @@ void setup(){
 void loop() {
   // calling waitForTick() at the beginning of loop will keep it periodic
   waitForTick(); 
+
+  // State Machine Manager
+  switch(state)
+  {
+    case MOVE:
+      move();
+    break;
+    case OBJECT_IN_PATH:
+      objectInPath();
+    break;
+    case AT_STATION:
+      atStation();
+    break;
+  }
+  
+
+
+
+
+
+
+
+  
   
   // Example of reading the ultrasonic rangefinder and printing to
   // the serial port.
