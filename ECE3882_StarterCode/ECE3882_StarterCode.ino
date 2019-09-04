@@ -41,6 +41,7 @@
 // global variables
 Servo head;  // create servo object to control the looking direction
 long prevMillis; // used to time loop()
+short state;
 
 /**
  *  Create reusable functions here or in additional files that
@@ -58,22 +59,36 @@ long prevMillis; // used to time loop()
  * 
  * Waits for one second, then checks whether there is an object to the right of the robot within 12 inches.
  */
-void atStation(){
-  
+int atStation(){
+  delay(1000); // wait one second
+  head.write(180); // look to the right.
+  while((readDistance() != 0) || (readDistance() < 31))
+  {
+    // do nothing.
+  }
+
+  head.write(90); // look forward.
+  return MOVE; // move on to MOVE state.
 }
 
 /*
  * Function for state "MOVE"
  */
-void move(){
+int move(){
   // 
 }
 
 /*
  * Function for state "OBJECT_IN_PATH"
+ * 
+ * Waits until the object is no longer in the path.
  */
-void objectInPath(){
-  
+int objectInPath(){
+  while((readDistance() != 0) || (readDistance() < 10))
+  {
+    // do nothing.
+  }
+  return MOVE;
 }
 
 /**
@@ -160,13 +175,13 @@ void loop() {
   switch(state)
   {
     case MOVE:
-      move();
+      state = move();
     break;
     case OBJECT_IN_PATH:
-      objectInPath();
+      state = objectInPath();
     break;
     case AT_STATION:
-      atStation();
+      state = atStation();
     break;
   }
   
