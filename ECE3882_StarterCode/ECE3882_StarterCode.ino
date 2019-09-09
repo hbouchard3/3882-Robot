@@ -118,7 +118,7 @@ int move(){
     return AT_STATION;
   }
   
-  if(readDistance<=30)  // stop for obstruction
+  if(readDistance()<=30)  // stop for obstruction
   {
     stopRobot();
     return OBJECT_IN_PATH;
