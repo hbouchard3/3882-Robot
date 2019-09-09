@@ -18,11 +18,6 @@
 #define R_1 9  // right motor control
 #define R_2 11 // right motor control
 
-// state machine states
-#define MOVE 12
-#define OBJECT_IN_PATH 13
-#define AT_STATION 14
-
 // Ultrasonic rangefinder pin connections
 #define Echo A4
 #define Trig A5
@@ -37,14 +32,9 @@
 #define LT_M !digitalRead(4)
 #define LT_L !digitalRead(2)
 
-int readDistance();
-void stopRobot();
-
-
 // global variables
 Servo head;  // create servo object to control the looking direction
 long prevMillis; // used to time loop()
-short state;
 
 /**
  *  Create reusable functions here or in additional files that
@@ -53,91 +43,8 @@ short state;
  *  or make the robot as a whole turn left or right or go
  *  straight (or you could do the former and then use that to
  *  create the latter), and functions could interpret sensor
- *  data, change states, enact behaviors, etc.
+ *  data, change states, R_ENct behaviors, etc.
  */
-
-
-/*
- * Function for state "AT_STATION"
- * 
- * Waits for one second, then checks whether there is an object to the right of the robot within 12 inches.
- */
-int atStation(){
-  delay(1000); // wait one second
-  head.write(180); // look to the right.
-  while((readDistance() != 0) || (readDistance() < 31))
-  {
-    // do nothing.
-  }
-
-  head.write(90); // look forward.
-  return MOVE; // move on to MOVE state.
-}
-
-/*
- * Function for state "MOVE"
- */
-int move(){
-
-  // Example of how the sensor macros can be used.  Whether or not this
-  // type of sensor interaction belongs in loop() is up to your
-  // code structure.
-  if(LT_M){
-    digitalWrite(R_EN, HIGH);
-    digitalWrite(L_EN, HIGH);
-    digitalWrite(L_1, HIGH);
-    digitalWrite(L_2, LOW);
-    digitalWrite(R_1, HIGH);
-    digitalWrite(R_2, LOW);
-  }
-  
-  if((LT_R)&&(LT_M))     // Turn right
-  {
-     digitalWrite(R_EN, HIGH);
-    digitalWrite(L_EN, HIGH);
-    digitalWrite(L_1, HIGH);
-    digitalWrite(L_2, LOW);
-    digitalWrite(R_1, LOW);
-    digitalWrite(R_2, LOW);
-   
-  }
-  
-  if((LT_L)&&(LT_M) )    // turn left
-  { digitalWrite(R_EN, HIGH);
-    digitalWrite(L_EN, HIGH);
-    digitalWrite(L_1, LOW);
-    digitalWrite(L_2, LOW);
-    digitalWrite(R_1, HIGH);
-    digitalWrite(R_2, LOW);
-  }
-  
-  if((LT_L) && (LT_R) && (LT_M))     // stop for station
-  { 
-    stopRobot();
-    head.write(0);// manufacturing stop at 12 inches as mentioned in the document
-    return AT_STATION;
-  }
-  
-  if(readDistance<=30)  // stop for obstruction
-  {
-    stopRobot();
-    return OBJECT_IN_PATH;
-  }
-   
-}
-
-/*
- * Function for state "OBJECT_IN_PATH"
- * 
- * Waits until the object is no longer in the path.
- */
-int objectInPath(){
-  while((readDistance() != 0) || (readDistance() < 10))
-  {
-    // do nothing.
-  }
-  return MOVE;
-}
 
 /**
  * You may or may not want functions like stopRobot().  With your chosen
@@ -145,6 +52,12 @@ int objectInPath(){
  * function that stops the robot?
  */
 void stopRobot(){
+  digitalWrite(R_EN, LOW);
+    digitalWrite(L_EN, LOW);
+  digitalWrite(L_1, LOW);
+    digitalWrite(L_2, LOW);
+    digitalWrite(R_1, LOW);
+    digitalWrite(R_2, LOW);
   // Disable the motors?  Set a speed variable to 0?
   // Depends on your hierarchy and where this function
   // fits into it.
@@ -152,12 +65,12 @@ void stopRobot(){
 
 /**
  *  Motor controller control information:
- *  Setting IN1 high and IN2 low sets the left motor forwards.
- *  IN3 low and IN4 high sets the right motor forwards.
+ *  Setting L_1 high and L_2 low sets the left motor forwards.
+ *  R_1 low and R_2 high sets the right motor forwards.
  *  Swap those polarities to make the motors turn backwards.
  *  Setting both control signals low applies a brake.
  *  When the IN_ signals are set for forwards or backwards,
- *  the ENA and ENB signals can be modulated with PWM
+ *  the R_EN and L_EN signals can be modulated with PWM
  *  to control the speed of the motors.  See the analogWrite()
  *  Arduino function for an easy way to create PWM.
  */
@@ -218,29 +131,6 @@ void setup(){
 void loop() {
   // calling waitForTick() at the beginning of loop will keep it periodic
   waitForTick(); 
-
-  // State Machine Manager
-  switch(state)
-  {
-    case MOVE:
-      state = move();
-    break;
-    case OBJECT_IN_PATH:
-      state = objectInPath();
-    break;
-    case AT_STATION:
-      state = atStation();
-    break;
-  }
-  
-
-
-
-
-
-
-
-  
   
   // Example of reading the ultrasonic rangefinder and printing to
   // the serial port.
@@ -248,12 +138,50 @@ void loop() {
   // any other code from executing until it returns.  This will
   // take a variable amount of time, up to ~10 ms.
   Serial.println(readDistance());
-  
+  if(readDistance()>=10)
+  {
   // Example of how the sensor macros can be used.  Whether or not this
   // type of sensor interaction belongs in loop() is up to your
   // code structure.
   if(LT_M){
-    // Do something based on the middle sensor detecting a dark surface
+    digitalWrite(R_EN, HIGH);
+    digitalWrite(L_EN, HIGH);
+    digitalWrite(L_1, HIGH);
+    digitalWrite(L_2, LOW);
+    digitalWrite(R_1, HIGH);
+    digitalWrite(R_2, LOW);
   }
-
+  
+  if((LT_R)&&(LT_M))     // Turn right
+  {
+     digitalWrite(R_EN, HIGH);
+    digitalWrite(L_EN, HIGH);
+    digitalWrite(L_1, HIGH);
+    digitalWrite(L_2, LOW);
+    digitalWrite(R_1, LOW);
+    digitalWrite(R_2, LOW);
+   
+  }
+  
+  if((LT_L)&&(LT_M) )    // turn left
+  { digitalWrite(R_EN, HIGH);
+    digitalWrite(L_EN, HIGH);
+    digitalWrite(L_1, LOW);
+    digitalWrite(L_2, LOW);
+    digitalWrite(R_1, HIGH);
+    digitalWrite(R_2, LOW);
+  }
+  
+  if((LT_L) && (LT_R) && (LT_M))     // stop
+  { stopRobot();
+  head.write(0);// manufacturing stop at 12 inches as mentioned in the document
+  if(readDistance<=30)
+  {stopRobot();
+  }
+  }
+  }
+  else 
+  {
+    stopRobot();
+  }
 }
