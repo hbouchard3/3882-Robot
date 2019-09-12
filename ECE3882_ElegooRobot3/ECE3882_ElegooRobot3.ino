@@ -96,40 +96,47 @@ int move(){
   }
   */
   
-  if(!LT_R)     // Turn right
+  if(LT_R)     // Turn right
   {
-    analogWrite(R_EN, 128);
-    analogWrite(L_EN, 128);
+    while(LT_R)
+    {
+    analogWrite(R_EN, 60);
+    analogWrite(L_EN, 150);
     digitalWrite(R_1, HIGH);
-    digitalWrite(R_2, HIGH);
-    digitalWrite(L_1, LOW);
+    digitalWrite(R_2, LOW);
+    digitalWrite(L_1, HIGH);
     digitalWrite(L_2, LOW);
     Serial.println("LTR");
-   
+    }
   }
   
-  if(!LT_L)    // turn left
-  { 
-    analogWrite(6, 128);
-    analogWrite(5, 128);
-    digitalWrite(9, LOW);
-    digitalWrite(11, LOW);
-    digitalWrite(7, HIGH);
-    digitalWrite(8, LOW);
+  if(LT_L)    // turn left
+  {
+    while(LT_L){
+    analogWrite(R_EN, 150);
+    analogWrite(L_EN, 60);
+    digitalWrite(R_1, LOW);
+    digitalWrite(R_2, HIGH);
+    digitalWrite(L_1, LOW);
+    digitalWrite(L_2, HIGH);
     Serial.println("LTL");
-    
+    }
   }
 
-/*
+
   if((LT_L) && (LT_R) && (LT_M))     // stop for station
   { 
     stopRobot();
     head.write(0);// manufacturing stop at 12 inches as mentioned in the document
     Serial.println("Station");
+    while(true)
+    {
+      
+    }
     return AT_STATION;
     
   }
-  
+ 
   if(readDistance()<=30)  // stop for obstruction
   {
     stopRobot();
@@ -137,7 +144,7 @@ int move(){
     return OBJECT_IN_PATH;
   
   }
-*/
+
   return MOVE;
   
 }
