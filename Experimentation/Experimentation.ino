@@ -65,14 +65,33 @@ int motorPower;
  * Waits for one second, then checks whether there is an object to the right of the robot within 12 inches.
  */
 int atStation(){
+  head.write(0); // look to the right
   delay(1000); // wait one second
-  head.write(180); // look to the right.
+
+  /*
   while((readDistance() != 0) || (readDistance() < 31))
   {
     // do nothing.
-  }
+  }*/
+  
 
   head.write(90); // look forward.
+
+  // move forward until not all three line sensors are on.
+  motorPower = 1;
+  while(LT_R && LT_L && LT_M)
+  {
+    analogWrite(R_EN, motorPower);
+    analogWrite(L_EN, motorPower);
+    digitalWrite(L_1, HIGH);
+    digitalWrite(L_2, LOW);
+    digitalWrite(R_1, LOW);
+    digitalWrite(R_2, HIGH);
+    motorPower++;
+  }
+  stopRobot();
+  delay(1000);
+  
   return MOVE; // move on to MOVE state.
 }
 
@@ -84,24 +103,51 @@ int move(){
   // Example of how the sensor macros can be used.  Whether or not this
   // type of sensor interaction belongs in loop() is up to your
   // code structure.
+  
+  if((LT_L) && (LT_R) && (LT_M))     // stop for station
+  { 
+    stopRobot();
+    return AT_STATION;
+    
+  }
+
 
   
-  if (!LT_R & !LT_L) 
+  if (!LT_R & !LT_L) // go forward
   {
-    analogWrite(R_EN, 80);
-    analogWrite(L_EN, 80);
+    motorPower = 200;
+    while(!LT_R & !LT_L)
+    {
+    analogWrite(R_EN, 90);
+    analogWrite(L_EN, 90);
     digitalWrite(L_1, HIGH);
     digitalWrite(L_2, LOW);
     digitalWrite(R_1, LOW);
     digitalWrite(R_2, HIGH);
     Serial.println ("LTM");
+    if(motorPower <= 60)
+      motorPower = 60;
+    else
+      motorPower--;
+
+
+    
+    int distance = readDistance();
+    Serial.println(distance);
+    if((distance<=30) && (distance != 0))  // stop for obstruction
+    {
+      stopRobot();
+      return OBJECT_IN_PATH;
+    }
+    }    
   }
  
   
   if(LT_R)     // Turn right
   {
-    motorPower = 150;
-    while(LT_R)
+    motorPower = 100;
+    
+    while(LT_R && !(LT_R && LT_L))
     {
     
     analogWrite(R_EN, 80);
@@ -111,49 +157,26 @@ int move(){
     digitalWrite(L_1, HIGH);
     digitalWrite(L_2, LOW);
     Serial.println("LTR");
-    Serial.println(millis()-initialTime);
     motorPower++;
     }
   }
   
   if(LT_L)    // turn left
   {
-    motorPower = 150;
-    initialTime = millis();
-    while(LT_L){
-    analogWrite(R_EN, motorPower);
-    analogWrite(L_EN, 80);
-    digitalWrite(R_1, LOW);
-    digitalWrite(R_2, HIGH);
-    digitalWrite(L_1, LOW);
-    digitalWrite(L_2, HIGH);
-    Serial.println("LTL");
-    
-    motorPower++;
+    motorPower = 100;
+    while(LT_L && !(LT_R && LT_L)){
+      analogWrite(R_EN, motorPower);
+      analogWrite(L_EN, 80);
+      digitalWrite(R_1, LOW);
+      digitalWrite(R_2, HIGH);
+      digitalWrite(L_1, LOW);
+      digitalWrite(L_2, HIGH);
+      Serial.println("LTL");
+      motorPower++;
     }
   }
 
 
-  if((LT_L) && (LT_R) && (LT_M))     // stop for station
-  { 
-    stopRobot();
-    head.write(0);// manufacturing stop at 12 inches as mentioned in the document
-    Serial.println("Station");
-    while(true)
-    {
-      
-    }
-    return AT_STATION;
-    
-  }
- 
-  if(readDistance()<=30)  // stop for obstruction
-  {
-    stopRobot();
-    Serial.println("Object");
-    return OBJECT_IN_PATH;
-  
-  }
 
   return MOVE;
   
@@ -165,9 +188,10 @@ int move(){
  * Waits until the object is no longer in the path.
  */
 int objectInPath(){
-  while((readDistance() != 0) || (readDistance() < 10))
+  while((readDistance() != 0) && (readDistance() < 30))
   {
     // do nothing.
+    Serial.println(readDistance());
   }
   return MOVE;
 }
@@ -181,6 +205,9 @@ void stopRobot(){
   // Disable the motors?  Set a speed variable to 0?
   // Depends on your hierarchy and where this function
   // fits into it.
+    analogWrite(R_EN, 0);
+    analogWrite(L_EN, 0);
+  
 } 
 
 /**
@@ -257,14 +284,12 @@ void setup(){
 void loop() {
   // calling waitForTick() at the beginning of loop will keep it periodic
   waitForTick(); 
-
+    
   // State Machine Manager
   switch(state)
   {
     case MOVE:
-      Serial.println("hello");
       state = move();
-      Serial.println("end");
     break;
     case OBJECT_IN_PATH:
       state = objectInPath();
@@ -273,13 +298,6 @@ void loop() {
       state = atStation();
     break;
   }
-  
-
-
-
-
-
-
 
   
   
