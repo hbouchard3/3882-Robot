@@ -45,6 +45,8 @@ void stopRobot();
 Servo head;  // create servo object to control the looking direction
 long prevMillis; // used to time loop()
 short state;
+int initialTime;
+int motorPower;
 
 /**
  *  Create reusable functions here or in additional files that
@@ -83,43 +85,51 @@ int move(){
   // type of sensor interaction belongs in loop() is up to your
   // code structure.
 
-  /*
-  if (LT_M) 
+  
+  if (!LT_R & !LT_L) 
   {
-    analogWrite(R_EN, 128);
-    analogWrite(L_EN, 128);
+    analogWrite(R_EN, 80);
+    analogWrite(L_EN, 80);
     digitalWrite(L_1, HIGH);
     digitalWrite(L_2, LOW);
-    digitalWrite(R_1, HIGH);
+    digitalWrite(R_1, LOW);
     digitalWrite(R_2, HIGH);
     Serial.println ("LTM");
   }
-  */
+ 
   
   if(LT_R)     // Turn right
   {
+    motorPower = 150;
     while(LT_R)
     {
-    analogWrite(R_EN, 60);
-    analogWrite(L_EN, 150);
+    
+    analogWrite(R_EN, 80);
+    analogWrite(L_EN, motorPower);
     digitalWrite(R_1, HIGH);
     digitalWrite(R_2, LOW);
     digitalWrite(L_1, HIGH);
     digitalWrite(L_2, LOW);
     Serial.println("LTR");
+    Serial.println(millis()-initialTime);
+    motorPower++;
     }
   }
   
   if(LT_L)    // turn left
   {
+    motorPower = 150;
+    initialTime = millis();
     while(LT_L){
-    analogWrite(R_EN, 150);
-    analogWrite(L_EN, 60);
+    analogWrite(R_EN, motorPower);
+    analogWrite(L_EN, 80);
     digitalWrite(R_1, LOW);
     digitalWrite(R_2, HIGH);
     digitalWrite(L_1, LOW);
     digitalWrite(L_2, HIGH);
     Serial.println("LTL");
+    
+    motorPower++;
     }
   }
 
