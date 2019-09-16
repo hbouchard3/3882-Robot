@@ -68,11 +68,11 @@ int atStation(){
   head.write(0); // look to the right
   delay(1000); // wait one second
 
-  /*
-  while((readDistance() != 0) || (readDistance() < 31))
+  while((readDistance() != 0) && (readDistance() < 30))
   {
     // do nothing.
-  }*/
+    Serial.println(readDistance());
+  }
   
 
   head.write(90); // look forward.
@@ -110,8 +110,6 @@ int move(){
     return AT_STATION;
     
   }
-
-
   
   if (!LT_R & !LT_L) // go forward
   {
@@ -149,7 +147,6 @@ int move(){
     
     while(LT_R && !(LT_R && LT_L))
     {
-    
     analogWrite(R_EN, 80);
     analogWrite(L_EN, motorPower);
     digitalWrite(R_1, HIGH);
