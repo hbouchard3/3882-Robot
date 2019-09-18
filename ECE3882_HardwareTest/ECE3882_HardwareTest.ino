@@ -61,7 +61,7 @@ void setup(){
   head.write(0);
   delay(2000);
   // Set the head looking to the other side.
-  head.write(180);
+  head.write(200);
   delay(2000);
   // and to the middle
   head.write(90);
