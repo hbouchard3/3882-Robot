@@ -96,11 +96,11 @@ int atStation(){
   head.write(0); // look to the right
   delay(1000); // wait one second
 
-  while((readDistance() != 0) && (readDistance() < 30))
+  /*
+  while((readDistance() != 0) || (readDistance() < 31))
   {
     // do nothing.
-    Serial.println(readDistance());
-  }
+  }*/
   
 
   head.write(90); // look forward.
@@ -132,6 +132,16 @@ int move(){
   // type of sensor interaction belongs in loop() is up to your
   // code structure.
   
+<<<<<<< HEAD
+=======
+  if((LT_L) && (LT_R) && (LT_M))     // stop for station
+  { 
+    stopRobot();
+    return AT_STATION;
+    
+  }
+
+>>>>>>> parent of f32138d... think its done
 
   
   if (!LT_R & !LT_L) // go forward
@@ -170,6 +180,7 @@ int move(){
     innerMotorPower = 80;
     while(!LT_L || LT_M)
     {
+<<<<<<< HEAD
   if((LT_L) && (LT_R) && (LT_M))     // stop for station
   { 
     stopRobot();
@@ -177,6 +188,10 @@ int move(){
     
   }
     analogWrite(R_EN, innerMotorPower);
+=======
+    
+    analogWrite(R_EN, 80);
+>>>>>>> parent of f32138d... think its done
     analogWrite(L_EN, motorPower);
     digitalWrite(R_1, HIGH);
     digitalWrite(R_2, LOW);
