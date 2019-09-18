@@ -68,10 +68,10 @@ int atStation(){
   head.write(0); // look to the right
   delay(1000); // wait one second
 
-  while((readDistance() != 0) && (readDistance() < 30))
+  
+  while((readDistance() != 0))
   {
-    // do nothing.
-    Serial.println(readDistance());
+    // do nothing
   }
   
 
@@ -106,10 +106,13 @@ int move(){
   
   if((LT_L) && (LT_R) && (LT_M))     // stop for station
   { 
+    delay(100);
     stopRobot();
     return AT_STATION;
     
   }
+
+
   
   if (!LT_R & !LT_L) // go forward
   {
@@ -143,11 +146,12 @@ int move(){
   
   if(LT_R)     // Turn right
   {
-    motorPower = 100;
+    motorPower = 120;
     
     while(LT_R && !(LT_R && LT_L))
     {
-    analogWrite(R_EN, 80);
+    
+    analogWrite(R_EN, 100);
     analogWrite(L_EN, motorPower);
     digitalWrite(R_1, HIGH);
     digitalWrite(R_2, LOW);
@@ -160,7 +164,7 @@ int move(){
   
   if(LT_L)    // turn left
   {
-    motorPower = 100;
+    motorPower = 120;
     while(LT_L && !(LT_R && LT_L)){
       analogWrite(R_EN, motorPower);
       analogWrite(L_EN, 80);
@@ -280,8 +284,21 @@ void setup(){
 
 void loop() {
   // calling waitForTick() at the beginning of loop will keep it periodic
-  waitForTick(); 
-    
+  waitForTick();
+
+/*
+  while(true){
+      analogWrite(R_EN, 80);
+      analogWrite(L_EN, 80);
+      digitalWrite(R_1, LOW);
+      digitalWrite(R_2, HIGH);
+      digitalWrite(L_1, LOW);
+      digitalWrite(L_2, HIGH);
+      Serial.println("LTL");
+  }
+  */
+
+  
   // State Machine Manager
   switch(state)
   {
@@ -303,6 +320,7 @@ void loop() {
   // Note that readDistance() is blocking, meaning that it will prevent
   // any other code from executing until it returns.  This will
   // take a variable amount of time, up to ~10 ms.
+  //head.write(0);
   Serial.println(readDistance());
   
   // Example of how the sensor macros can be used.  Whether or not this
