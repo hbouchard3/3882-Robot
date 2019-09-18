@@ -1,8 +1,3 @@
-/**
- * This file provides some starting structure for controlling
- * the Elegoo robot car and interfacing with its sensors.
- */
- 
 // Library for controlling the hobby servo
 #include <Servo.h>
 
@@ -48,17 +43,6 @@ short state;
 int initialTime;
 int motorPower;
 
-/**
- *  Create reusable functions here or in additional files that
- *  you #include.  For example, functions could
- *  set the speed and direction of the left side and right side,
- *  or make the robot as a whole turn left or right or go
- *  straight (or you could do the former and then use that to
- *  create the latter), and functions could interpret sensor
- *  data, change states, enact behaviors, etc.
- */
-
-
 /*
  * Function for state "AT_STATION"
  * 
@@ -68,29 +52,23 @@ int atStation(){
   head.write(0); // look to the right
   delay(2000); // wait one second
 
-  
   while((readDistance() != 0) && (readDistance() < 80))
   {
     // do nothing
   }
   
-
   head.write(90); // look forward.
 
   // move forward until not all three line sensors are on.
-  motorPower = 170;
   while(LT_R && LT_L && LT_M)
   {
-    analogWrite(R_EN, motorPower);
-    analogWrite(L_EN, motorPower);
+    analogWrite(R_EN, 170);
+    analogWrite(L_EN, 170);
     digitalWrite(L_1, HIGH);
     digitalWrite(L_2, LOW);
     digitalWrite(R_1, LOW);
     digitalWrite(R_2, HIGH);
-    //motorPower++;
   }
-  
-  //delay(100);
   stopRobot();
   delay(1000);
   
@@ -108,12 +86,9 @@ int move(){
   
   if((LT_L) && (LT_R) && (LT_M))     // stop for station
   { 
-    //delay(100);
     stopRobot();
     return AT_STATION;
   }
-
-
   
   if (!LT_R & !LT_L) // go forward
   {
@@ -255,9 +230,6 @@ void setup(){
   // Start serial comm in case you want to debug with it
   Serial.begin(9600);
 
-  
-
-
   state = MOVE;
 
   // Configure the pins that are outputs
@@ -283,19 +255,6 @@ void setup(){
 void loop() {
   // calling waitForTick() at the beginning of loop will keep it periodic
   waitForTick();
-
-/*
-  while(true){
-      analogWrite(R_EN, 80);
-      analogWrite(L_EN, 80);
-      digitalWrite(R_1, LOW);
-      digitalWrite(R_2, HIGH);
-      digitalWrite(L_1, LOW);
-      digitalWrite(L_2, HIGH);
-      Serial.println("LTL");
-  }
-  */
-
   
   // State Machine Manager
   switch(state)
@@ -310,22 +269,4 @@ void loop() {
       state = atStation();
     break;
   }
-
-  
-  
-  // Example of reading the ultrasonic rangefinder and printing to
-  // the serial port.
-  // Note that readDistance() is blocking, meaning that it will prevent
-  // any other code from executing until it returns.  This will
-  // take a variable amount of time, up to ~10 ms.
-  //head.write(0);
-  Serial.println(readDistance());
-  
-  // Example of how the sensor macros can be used.  Whether or not this
-  // type of sensor interaction belongs in loop() is up to your
-  // code structure.
-  if(LT_M){
-    // Do something based on the middle sensor detecting a dark surface
-  }
-
 }
