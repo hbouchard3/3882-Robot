@@ -47,7 +47,6 @@ long prevMillis; // used to time loop()
 short state;
 int initialTime;
 int motorPower;
-int innerMotorPower;
 
 /**
  *  Create reusable functions here or in additional files that
@@ -66,41 +65,14 @@ int innerMotorPower;
  * Waits for one second, then checks whether there is an object to the right of the robot within 12 inches.
  */
 int atStation(){
-  // move forward until left or right becomes white
-  motorPower = 1;
-  while(LT_R && LT_L)
-  {
-    analogWrite(R_EN, motorPower);
-    analogWrite(L_EN, motorPower);
-    digitalWrite(L_1, HIGH);
-    digitalWrite(L_2, LOW);
-    digitalWrite(R_1, LOW);
-    digitalWrite(R_2, HIGH);
-    motorPower++;
-  }
-
-  motorPower = 100;
-  while(LT_L)
-  {
-    analogWrite(R_EN, 80);
-    analogWrite(L_EN, motorPower);
-    digitalWrite(R_1, HIGH);
-    digitalWrite(R_2, LOW);
-    digitalWrite(L_1, HIGH);
-    digitalWrite(L_2, LOW);
-    Serial.println("LTR");
-    motorPower += 2;
-  }
-  
-  
   head.write(0); // look to the right
   delay(1000); // wait one second
 
-  /*
-  while((readDistance() != 0) || (readDistance() < 31))
+  while((readDistance() != 0) && (readDistance() < 30))
   {
     // do nothing.
-  }*/
+    Serial.println(readDistance());
+  }
   
 
   head.write(90); // look forward.
@@ -132,17 +104,12 @@ int move(){
   // type of sensor interaction belongs in loop() is up to your
   // code structure.
   
-<<<<<<< HEAD
-=======
   if((LT_L) && (LT_R) && (LT_M))     // stop for station
   { 
     stopRobot();
     return AT_STATION;
     
   }
-
->>>>>>> parent of f32138d... think its done
-
   
   if (!LT_R & !LT_L) // go forward
   {
@@ -177,52 +144,32 @@ int move(){
   if(LT_R)     // Turn right
   {
     motorPower = 100;
-    innerMotorPower = 80;
-    while(!LT_L || LT_M)
+    
+    while(LT_R && !(LT_R && LT_L))
     {
-<<<<<<< HEAD
-  if((LT_L) && (LT_R) && (LT_M))     // stop for station
-  { 
-    stopRobot();
-    return AT_STATION;
-    
-  }
-    analogWrite(R_EN, innerMotorPower);
-=======
-    
     analogWrite(R_EN, 80);
->>>>>>> parent of f32138d... think its done
     analogWrite(L_EN, motorPower);
     digitalWrite(R_1, HIGH);
     digitalWrite(R_2, LOW);
     digitalWrite(L_1, HIGH);
     digitalWrite(L_2, LOW);
     Serial.println("LTR");
-    motorPower += 2;
-    innerMotorPower++;
+    motorPower++;
     }
   }
   
   if(LT_L)    // turn left
   {
     motorPower = 100;
-    innerMotorPower = 80;
-    while(!LT_R || LT_M){
-      if((LT_L) && (LT_R) && (LT_M))     // stop for station
-      { 
-    stopRobot();
-    return AT_STATION;
-    
-  }
+    while(LT_L && !(LT_R && LT_L)){
       analogWrite(R_EN, motorPower);
-      analogWrite(L_EN, innerMotorPower);
+      analogWrite(L_EN, 80);
       digitalWrite(R_1, LOW);
       digitalWrite(R_2, HIGH);
       digitalWrite(L_1, LOW);
       digitalWrite(L_2, HIGH);
       Serial.println("LTL");
-    motorPower += 2;
-    innerMotorPower++;
+      motorPower++;
     }
   }
 
@@ -308,6 +255,7 @@ void setup(){
 
   
 
+
   state = MOVE;
 
   // Configure the pins that are outputs
@@ -323,8 +271,6 @@ void setup(){
 
   // Attach the servo controller to the servo pin
   head.attach(ServoPin);
-
-
   // Set the head looking forward.
   head.write(90);
 
@@ -335,11 +281,10 @@ void setup(){
 void loop() {
   // calling waitForTick() at the beginning of loop will keep it periodic
   waitForTick(); 
-  /*
+    
   // State Machine Manager
   switch(state)
   {
-
     case MOVE:
       state = move();
     break;
@@ -350,7 +295,7 @@ void loop() {
       state = atStation();
     break;
   }
-*/
+
   
   
   // Example of reading the ultrasonic rangefinder and printing to
