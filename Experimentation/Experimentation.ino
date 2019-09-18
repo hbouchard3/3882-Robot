@@ -66,10 +66,10 @@ int motorPower;
  */
 int atStation(){
   head.write(0); // look to the right
-  delay(1000); // wait one second
+  delay(2000); // wait one second
 
   
-  while((readDistance() != 0))
+  while((readDistance() != 0) && (readDistance() < 80))
   {
     // do nothing
   }
@@ -78,7 +78,7 @@ int atStation(){
   head.write(90); // look forward.
 
   // move forward until not all three line sensors are on.
-  motorPower = 1;
+  motorPower = 170;
   while(LT_R && LT_L && LT_M)
   {
     analogWrite(R_EN, motorPower);
@@ -87,8 +87,10 @@ int atStation(){
     digitalWrite(L_2, LOW);
     digitalWrite(R_1, LOW);
     digitalWrite(R_2, HIGH);
-    motorPower++;
+    //motorPower++;
   }
+  
+  //delay(100);
   stopRobot();
   delay(1000);
   
@@ -106,10 +108,9 @@ int move(){
   
   if((LT_L) && (LT_R) && (LT_M))     // stop for station
   { 
-    delay(100);
+    //delay(100);
     stopRobot();
     return AT_STATION;
-    
   }
 
 
@@ -146,12 +147,12 @@ int move(){
   
   if(LT_R)     // Turn right
   {
-    motorPower = 120;
+    motorPower = 140;
     
     while(LT_R && !(LT_R && LT_L))
     {
     
-    analogWrite(R_EN, 100);
+    analogWrite(R_EN, 80);
     analogWrite(L_EN, motorPower);
     digitalWrite(R_1, HIGH);
     digitalWrite(R_2, LOW);
@@ -164,7 +165,7 @@ int move(){
   
   if(LT_L)    // turn left
   {
-    motorPower = 120;
+    motorPower = 140;
     while(LT_L && !(LT_R && LT_L)){
       analogWrite(R_EN, motorPower);
       analogWrite(L_EN, 80);
@@ -176,9 +177,6 @@ int move(){
       motorPower++;
     }
   }
-
-
-
   return MOVE;
   
 }
